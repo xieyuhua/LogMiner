@@ -143,8 +143,6 @@ func (r *Migrate) syncTableIncrRecord() error {
 		// 	return err
 		// }
 		// fmt.Println(redoLogList)
-
-		zap.L().Warn("increment table log file logminer null data, transferdb will continue to capture")
 		continue
 	}
 	return nil

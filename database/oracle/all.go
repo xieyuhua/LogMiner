@@ -217,13 +217,14 @@ END;`)
 	if err != nil {
 		return fmt.Errorf("oracle logminer stored procedure sql [%v] startscn [%v] failed: %v", sql, scn, err)
 	}
+
 	return nil
 }
 
 func (o *Oracle) EndOracleLogminerStoredProcedure() error {
 	ctx, _ := context.WithCancel(context.Background())
 	_, err := o.OracleDB.ExecContext(ctx, common.StringsBuilder(`BEGIN
-  dbms_logmnr.end_logmnr();
+  sys.dbms_logmnr.end_logmnr();
 END;`))
 	if err != nil {
 		return fmt.Errorf("oracle logminer stored procedure end failed: %v", err)

@@ -10,11 +10,12 @@ pprof-port = ":9696"
 
 
 [oracle]
-username = "test"
-password = "test"
-host = "192.168.9.26"
+username = "H2"
+password = "25282"
+host = "192.477.9.9"
 port = 1521
-schema-name = "test"
+schema-name = "H2"
+nls-lang = "417417"
 
 # include-table 和 exclude-table 不能同时配置，两者只能配置一个,如果两个都没配置则 Schema 内表全迁移
 # include-table 和 exclude-table 支持正则表达式以及通配符（tab_*/tab*）

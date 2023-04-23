@@ -20,10 +20,11 @@ type Oracle struct {
 
 // 创建 oracle 数据库引擎
 func NewOracleDBEngine(ctx context.Context, oraCfg config.OracleConfig) (*Oracle, error) {
-	connString := fmt.Sprintf("oracle://%s:%s@%s/ORCL",
+	connString := fmt.Sprintf("oracle://%s:%s@%s/%s",
 		oraCfg.Username,
 		oraCfg.Password,
-		common.StringsBuilder(oraCfg.Host, ":", strconv.Itoa(oraCfg.Port)))
+		common.StringsBuilder(oraCfg.Host, ":", strconv.Itoa(oraCfg.Port)),
+		oraCfg.NLSLang)
 	fmt.Println(connString)
 	db, err := gorm.Open(sqloracle.Open(connString), &gorm.Config{})
 	if err != nil {
@@ -44,7 +45,12 @@ func NewOracleDBEngine(ctx context.Context, oraCfg config.OracleConfig) (*Oracle
 
 // Only Used for ALL Mode
 func NewOracleLogminerEngine(ctx context.Context, oraCfg config.OracleConfig) (*Oracle, error) {
-	db, err := gorm.Open(sqloracle.Open("oracle://test:test@192.168.9.26:1521/ORCL"), &gorm.Config{})
+	connString := fmt.Sprintf("oracle://%s:%s@%s/%s",
+		oraCfg.Username,
+		oraCfg.Password,
+		common.StringsBuilder(oraCfg.Host, ":", strconv.Itoa(oraCfg.Port)),
+		oraCfg.NLSLang)
+	db, err := gorm.Open(sqloracle.Open(connString), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
 	}
