@@ -72,7 +72,7 @@ func (r *Migrate) syncTableIncrRecord() error {
 	if err != nil {
 		return err
 	}
-
+	// fmt.Println(logFiles)
 	zap.L().Info("increment table log file get",
 		zap.String("logfile", fmt.Sprintf("%v", logFiles)))
 	// 遍历所有日志文件
@@ -117,12 +117,14 @@ func (r *Migrate) syncTableIncrRecord() error {
 		rowsResult, MaxSCN, _ := r.OracleMiner.GetOracleIncrRecord(common.StringUPPER(r.Cfg.OracleConfig.SchemaName),
 			strconv.FormatUint(SourceTableSCN, 10),
 			r.Cfg.AllConfig.LogminerQueryTimeout)
-
 		//更新到最大
 		SourceTableSCN = MaxSCN
-		fmt.Println(logFileStartSCN)
-		fmt.Println(MaxSCN)
-		fmt.Println(rowsResult)
+		if len(rowsResult) > 0 {
+			fmt.Println(logFileStartSCN)
+			fmt.Println(MaxSCN)
+			fmt.Println(rowsResult)
+		}
+
 		if err != nil {
 			return err
 		}
@@ -150,10 +152,10 @@ func (r *Migrate) syncTableIncrRecord() error {
 
 func (r *Migrate) getTableIncrRecordLogfile() ([]map[string]string, error) {
 	var logFiles []map[string]string
-
-
+	firstSCN, _, _, err := r.OracleMiner.GetOracleCurrentRedoMaxSCN()
+	// fmt.Println(firstSCN)
 	// 获取增量表起始最小 SCN 号
-	strGlobalSCN := strconv.FormatUint(1111416, 10)
+	strGlobalSCN := strconv.FormatUint(firstSCN, 10)
 
 	// 判断数据是在 archived log Or redo log
 	// 如果 redoSCN 等于 0，说明数据在归档日志
