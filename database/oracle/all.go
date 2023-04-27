@@ -19,7 +19,7 @@ type logminers struct {
 }
 
 // 捕获增量数据
-func (o *Oracle) GetOracleIncrRecord(sourceSchema, lastCheckpoint string, queryTimeout int) ([]logminers, uint64, error) {
+func (o *Oracle) GetOracleIncrRecord(sourceSchema, sourceTable string, lastCheckpoint string, queryTimeout int) ([]logminers, uint64, error) {
 	var lcs []logminers
 	var MaxSCN uint64
 	logFileEndSCN, err := common.StrconvUintBitSize(lastCheckpoint, 64)
@@ -34,6 +34,7 @@ func (o *Oracle) GetOracleIncrRecord(sourceSchema, lastCheckpoint string, queryT
   FROM V$LOGMNR_CONTENTS
  WHERE 1 = 1
    AND UPPER(SEG_OWNER) = '`, common.StringUPPER(sourceSchema), `'
+   AND UPPER(TABLE_NAME) IN (`, sourceTable, `)
    AND OPERATION IN ('INSERT', 'DELETE', 'UPDATE', 'DDL')
    AND SCN > `, lastCheckpoint, ` ORDER BY SCN`)
 	rows, err := o.OracleDB.Query(querySQL)

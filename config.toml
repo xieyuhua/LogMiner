@@ -20,7 +20,7 @@ service-name = "ORCL"
 # include-table 和 exclude-table 不能同时配置，两者只能配置一个,如果两个都没配置则 Schema 内表全迁移
 # include-table 和 exclude-table 支持正则表达式以及通配符（tab_*/tab*）
 include-table = []
-exclude-table = []
+exclude-table = ["TEST"]
 
 [log]
 # 日志 level

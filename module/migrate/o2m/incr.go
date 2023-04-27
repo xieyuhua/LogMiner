@@ -72,7 +72,6 @@ func (r *Migrate) Incr() error {
 		fmt.Println(res)
 	}
 
-	
 	fmt.Println("############增量##############")
 
 	// 增量数据同步
@@ -132,8 +131,13 @@ func (r *Migrate) syncTableIncrRecord() error {
 		if err != nil {
 			return err
 		}
+		exporters, err := filterCFGTable(r.Cfg, r.Oracle)
+		if err != nil {
+			return err
+		}
 		// // 捕获数据
 		rowsResult, MaxSCN, _ := r.OracleMiner.GetOracleIncrRecord(common.StringUPPER(r.Cfg.OracleConfig.SchemaName),
+			common.StringArrayToCapitalChar(exporters),
 			strconv.FormatUint(SourceTableSCN, 10),
 			r.Cfg.AllConfig.LogminerQueryTimeout)
 		//更新到最大
