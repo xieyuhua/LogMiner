@@ -55,7 +55,26 @@ func (r *Migrate) Incr() error {
 	if common.VersionOrdinal(oraDBVersion) < common.VersionOrdinal(common.RequireOracleDBVersion) {
 		return fmt.Errorf("oracle db version [%v] is less than 11g, can't be using transferdb tools", oraDBVersion)
 	}
-	fmt.Println("##########################")
+	fmt.Println("###########全量###############")
+
+	// 获取 oracle 所有数据表
+	exporters, err := filterCFGTable(r.Cfg, r.Oracle)
+	if err != nil {
+		return err
+	}
+	fmt.Println(exporters)
+	for _, tableName := range exporters {
+		cols, res, err := r.Oracle.GetOracleTableRowsData(`select * from `+tableName, 10)
+		if err != nil {
+			return err
+		}
+		fmt.Println(cols)
+		fmt.Println(res)
+	}
+
+	
+	fmt.Println("############增量##############")
+
 	// 增量数据同步
 	for range time.Tick(300 * time.Millisecond) {
 		if err = r.syncTableIncrRecord(); err != nil {

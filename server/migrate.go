@@ -9,7 +9,6 @@ import (
 	"strings"
 )
 
-
 func IMigrateIncr(ctx context.Context, cfg *config.Config) error {
 	var (
 		i   migrate.Increr
@@ -22,6 +21,7 @@ func IMigrateIncr(ctx context.Context, cfg *config.Config) error {
 			return err
 		}
 	}
+	//全量 + 增量同步
 	err = i.Incr()
 	if err != nil {
 		return err
