@@ -2,7 +2,6 @@ package oracle
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"gominerlog/common"
 	"time"
@@ -25,9 +24,10 @@ func (o *Oracle) GetOracleIncrRecord(sourceSchema, lastCheckpoint string, queryT
 	var MaxSCN uint64
 	logFileEndSCN, err := common.StrconvUintBitSize(lastCheckpoint, 64)
 	MaxSCN = logFileEndSCN
+
 	querySQL := common.StringsBuilder(`SELECT SCN,
        SEG_OWNER AS SOURCE_SCHEMA,
-       TABLE_NAME AS SOURCE_TABLE,
+       cast((TABLE_NAME) as varchar2(1024)) AS SOURCE_TABLE,
        SQL_REDO,
        SQL_UNDO,
        OPERATION
@@ -55,13 +55,13 @@ func (o *Oracle) GetOracleIncrRecord(sourceSchema, lastCheckpoint string, queryT
 	defer rows.Close()
 	endTime := time.Now()
 
-	jsonLCS, err := json.Marshal(lcs)
-	if err != nil {
-		return lcs, MaxSCN, fmt.Errorf("json Marshal logminer failed: %v", err)
-	}
+	// jsonLCS, err := json.Marshal(lcs)
+	// if err != nil {
+	// return lcs, MaxSCN, fmt.Errorf("json Marshal logminer failed: %v", err)
+	// }
 	zap.L().Info("logminer sql",
 		zap.String("sql", querySQL),
-		zap.String("json logminer content", string(jsonLCS)),
+		// zap.String("json logminer content", string(jsonLCS)),
 		zap.String("start time", startTime.String()),
 		zap.String("end time", endTime.String()),
 		zap.String("cost time", endTime.Sub(startTime).String()))

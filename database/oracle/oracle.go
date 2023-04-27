@@ -24,7 +24,7 @@ func NewOracleDBEngine(ctx context.Context, oraCfg config.OracleConfig) (*Oracle
 		oraCfg.Username,
 		oraCfg.Password,
 		common.StringsBuilder(oraCfg.Host, ":", strconv.Itoa(oraCfg.Port)),
-		oraCfg.NLSLang)
+		oraCfg.ServiceName)
 	fmt.Println(connString)
 	db, err := gorm.Open(sqloracle.Open(connString), &gorm.Config{})
 	if err != nil {
@@ -49,7 +49,7 @@ func NewOracleLogminerEngine(ctx context.Context, oraCfg config.OracleConfig) (*
 		oraCfg.Username,
 		oraCfg.Password,
 		common.StringsBuilder(oraCfg.Host, ":", strconv.Itoa(oraCfg.Port)),
-		oraCfg.NLSLang)
+		oraCfg.ServiceName)
 	db, err := gorm.Open(sqloracle.Open(connString), &gorm.Config{})
 	if err != nil {
 		fmt.Println(err)
