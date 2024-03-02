@@ -2,6 +2,22 @@
 无需安装oracle客户端 基于LogMiner增量同步
 
 ```
+运行
+# go build
+# .\gominerlog.exe -mode incr
+# .\gominerlog.exe -mode full
+# .\gominerlog.exe -mode all
+
+PS E:\LogMiner> .\gominerlog.exe -mode incr
+oracle://H2:hyft@192.168.9.18:1521/hyee
+firstSCN: 17494430683543 maxSCN: 281474976710655 LOG_FILE: /u01/app/oracle/oradata/HYDEE/redo_6rd
+############增量##############
+[update "H2"."T_STORE_I_XLX" set "PID" = 1709264778 where "PID" = 1709264776]
+[update "H2"."T_STORE_I_XLX" set "PID" = 1709264776 where "PID" = 1709264778]
+```
+
+
+```
 /* 1.查看日志路径 */
 SELECT	* FROM	v$logfile;
 

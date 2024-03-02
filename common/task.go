@@ -1,4 +1,3 @@
-
 package common
 
 import "time"
@@ -22,8 +21,10 @@ const (
 	TaskModeCheck   = "CHECK"
 	TaskModeCompare = "COMPARE"
 	TaskModeCSV     = "CSV"
-	TaskModeFull    = "FULL"
-	TaskModeAll     = "ALL"
+	//现在使用的
+	TaskModeFull = "FULL"
+	TaskModeAll  = "ALL"
+	TaskModeINCR = "INCR"
 )
 
 // 任务状态

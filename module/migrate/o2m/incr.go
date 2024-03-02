@@ -7,6 +7,7 @@ import (
 	"gominerlog/config"
 	"gominerlog/database/oracle"
 	"strconv"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -32,9 +33,7 @@ func NewIncr(ctx context.Context, cfg *config.Config) (*Migrate, error) {
 		return nil, err
 	}
 	firstSCN, maxSCN, LOG_FILE, err := oracleMiner.GetOracleCurrentRedoMaxSCN()
-	fmt.Println(firstSCN)
-	fmt.Println(maxSCN)
-	fmt.Println(LOG_FILE)
+	fmt.Println("firstSCN:", firstSCN, "maxSCN:", maxSCN, "LOG_FILE:", LOG_FILE)
 	SourceTableSCN = 0
 	return &Migrate{
 		Ctx:         ctx,
@@ -44,7 +43,7 @@ func NewIncr(ctx context.Context, cfg *config.Config) (*Migrate, error) {
 	}, nil
 }
 
-func (r *Migrate) Incr() error {
+func (r *Migrate) Full() error {
 
 	// 判断上游 Oracle 数据库版本
 	// 需要 oracle 11g 及以上
@@ -64,12 +63,50 @@ func (r *Migrate) Incr() error {
 	}
 	fmt.Println(exporters)
 	for _, tableName := range exporters {
-		cols, res, err := r.Oracle.GetOracleTableRowsData(`select * from `+tableName, 10)
+		_, _, err := r.Oracle.GetOracleTableRowsData(`select * from `+tableName, 10)
 		if err != nil {
 			return err
 		}
-		fmt.Println(cols)
-		fmt.Println(res)
+	}
+	return nil
+}
+
+func (r *Migrate) Incr() error {
+	var err error
+	fmt.Println("############增量##############")
+	// 增量数据同步
+	for range time.Tick(300 * time.Millisecond) {
+		if err = r.syncTableIncrRecord(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *Migrate) FullIncr() error {
+
+	// 判断上游 Oracle 数据库版本
+	// 需要 oracle 11g 及以上
+	oraDBVersion, err := r.Oracle.GetOracleDBVersion()
+	if err != nil {
+		return err
+	}
+	if common.VersionOrdinal(oraDBVersion) < common.VersionOrdinal(common.RequireOracleDBVersion) {
+		return fmt.Errorf("oracle db version [%v] is less than 11g, can't be using transferdb tools", oraDBVersion)
+	}
+	fmt.Println("###########全量###############")
+
+	// 获取 oracle 所有数据表
+	exporters, err := filterCFGTable(r.Cfg, r.Oracle)
+	if err != nil {
+		return err
+	}
+	fmt.Println(exporters)
+	for _, tableName := range exporters {
+		_, _, err := r.Oracle.GetOracleTableRowsData(`select * from `+tableName, 10)
+		if err != nil {
+			return err
+		}
 	}
 
 	fmt.Println("############增量##############")
@@ -109,7 +146,6 @@ func (r *Migrate) syncTableIncrRecord() error {
 		//是否读取过
 		if SourceTableSCN < logFileStartSCN {
 			SourceTableSCN = logFileStartSCN
-			fmt.Println(99999999)
 		}
 
 		zap.L().Info("increment table log file logminer",
@@ -143,9 +179,18 @@ func (r *Migrate) syncTableIncrRecord() error {
 		//更新到最大
 		SourceTableSCN = MaxSCN
 		if len(rowsResult) > 0 {
-			fmt.Println(logFileStartSCN)
-			fmt.Println(MaxSCN)
-			fmt.Println(rowsResult)
+			// fmt.Println(logFileStartSCN)
+			// fmt.Println(MaxSCN)
+			for _, rs := range rowsResult {
+				// fmt.Println(rs.SCN)
+				// fmt.Println(rs.SourceSchema)
+				// fmt.Println(rs.SourceTable)
+				// fmt.Println(rs.Operation)
+				splitDDL := strings.Split(rs.SQLRedo, ` `)
+				fmt.Println(splitDDL)
+				// SQLUndo := strings.Split(rs.SQLUndo, ` `)
+				// fmt.Println(SQLUndo)
+			}
 		}
 
 		if err != nil {

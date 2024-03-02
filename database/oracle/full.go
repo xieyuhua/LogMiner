@@ -22,8 +22,6 @@ func (o *Oracle) GetOracleCurrentSnapshotSCN() (uint64, error) {
 	return globalSCN, nil
 }
 
-
-
 // 获取表字段名以及行数据 -> 用于 FULL/ALL
 func (o *Oracle) GetOracleTableRowsData(querySQL string, insertBatchSize int) ([]string, []string, error) {
 	var (
@@ -145,6 +143,8 @@ func (o *Oracle) GetOracleTableRowsData(querySQL string, insertBatchSize int) ([
 		// batch 批次
 		if len(rowsTMP) == insertBatchSize {
 			batchResults = append(batchResults, exstrings.Join(rowsTMP, ","))
+			fmt.Println(rowsTMP)
+
 			// 数组清空
 			rowsTMP = rowsTMP[0:0]
 		}

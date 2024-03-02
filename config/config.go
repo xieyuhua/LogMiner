@@ -73,7 +73,7 @@ func NewConfig() *Config {
 	}
 	fs.BoolVar(&cfg.PrintVersion, "V", false, "print version information and exit")
 	fs.StringVar(&cfg.ConfigFile, "config", "./config.toml", "path to the configuration file")
-	fs.StringVar(&cfg.TaskMode, "mode", "", "specify the program running mode: [prepare assess reverse full csv all check compare]")
+	fs.StringVar(&cfg.TaskMode, "mode", "", "specify the program running mode: [full、incr、all = full + incr]")
 	fs.StringVar(&cfg.DBTypeS, "source", "oracle", "specify the source db type")
 	fs.StringVar(&cfg.DBTypeT, "target", "mysql", "specify the target db type")
 	return cfg
