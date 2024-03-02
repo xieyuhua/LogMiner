@@ -9,11 +9,11 @@ pprof-port = ":9696"
 
 [oracle]
 username = "H2"
-password = "hydeesoft"
-host = "192.168.9.38"
+password = "hyft"
+host = "192.168.9.18"
 port = 1521
 schema-name = "H2"
-service-name = "hydee"
+service-name = "hyee"
 
 # include-table 和 exclude-table 不能同时配置，两者只能配置一个,如果两个都没配置则 Schema 内表全迁移
 # include-table 和 exclude-table 支持正则表达式以及通配符（tab_*/tab*）T_SALE_H
