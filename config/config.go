@@ -65,10 +65,10 @@ type LogConfig struct {
 
 func NewConfig() *Config {
 	cfg := &Config{}
-	cfg.FlagSet = flag.NewFlagSet("transferdb", flag.ContinueOnError)
+	cfg.FlagSet = flag.NewFlagSet("gominerlog", flag.ContinueOnError)
 	fs := cfg.FlagSet
 	fs.Usage = func() {
-		fmt.Fprintln(os.Stderr, "Usage of transferdb:")
+		fmt.Fprintln(os.Stderr, "Usage of gominerlog:")
 		fs.
 			PrintDefaults()
 	}
