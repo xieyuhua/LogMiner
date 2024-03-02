@@ -12,6 +12,7 @@ PS E:\LogMiner> .\gominerlog.exe -mode incr
 oracle://H2:hyft@192.168.9.18:1521/hyee
 firstSCN: 17494430683543 maxSCN: 281474976710655 LOG_FILE: /u01/app/oracle/oradata/HYDEE/redo_6rd
 ############增量##############
+LogMiner\module\migrate\o2m\incr.go:192
 [update "H2"."T_STORE_I_XLX" set "PID" = 1709264778 where "PID" = 1709264776]
 [update "H2"."T_STORE_I_XLX" set "PID" = 1709264776 where "PID" = 1709264778]
 ```
