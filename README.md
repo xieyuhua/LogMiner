@@ -18,6 +18,8 @@ firstSCN: 17494430683543 maxSCN: 281474976710655 LOG_FILE: /u01/app/oracle/orada
 
 
 ```
+ 增量定时 time.Tick(time.Duration(100) * time.Millisecond)
+
 /* 1.查看日志路径 */
 SELECT	* FROM	v$logfile;
 

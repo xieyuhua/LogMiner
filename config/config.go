@@ -44,6 +44,7 @@ type OracleConfig struct {
 	Host          string   `toml:"host" json:"host"`
 	Port          int      `toml:"port" json:"port"`
 	ServiceName   string   `toml:"service-name" json:"service-name"`
+	IncrTime      int      `toml:"incr-time" json:"incr-time"`
 	PDBName       string   `toml:"pdb-name" json:"pdb-name"`
 	LibDir        string   `toml:"lib-dir" json:"lib-dir"`
 	NLSLang       string   `toml:"nls-lang" json:"nls-lang"`

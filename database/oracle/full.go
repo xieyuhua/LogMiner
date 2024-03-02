@@ -143,6 +143,7 @@ func (o *Oracle) GetOracleTableRowsData(querySQL string, insertBatchSize int) ([
 		// batch 批次
 		if len(rowsTMP) == insertBatchSize {
 			batchResults = append(batchResults, exstrings.Join(rowsTMP, ","))
+			fmt.Println(cols)
 			fmt.Println(rowsTMP)
 
 			// 数组清空

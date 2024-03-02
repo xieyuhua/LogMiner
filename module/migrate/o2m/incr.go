@@ -33,7 +33,8 @@ func NewIncr(ctx context.Context, cfg *config.Config) (*Migrate, error) {
 		return nil, err
 	}
 	firstSCN, maxSCN, LOG_FILE, err := oracleMiner.GetOracleCurrentRedoMaxSCN()
-	fmt.Println("firstSCN:", firstSCN, "maxSCN:", maxSCN, "LOG_FILE:", LOG_FILE)
+	IncrTime := cfg.OracleConfig.IncrTime
+	fmt.Println("firstSCN:", firstSCN, "maxSCN:", maxSCN, "IncrTime:", IncrTime, "LOG_FILE:", LOG_FILE)
 	SourceTableSCN = 0
 	return &Migrate{
 		Ctx:         ctx,
@@ -75,7 +76,8 @@ func (r *Migrate) Incr() error {
 	var err error
 	fmt.Println("############增量##############")
 	// 增量数据同步
-	for range time.Tick(300 * time.Millisecond) {
+	IncrTime := r.Cfg.OracleConfig.IncrTime
+	for range time.Tick(time.Duration(IncrTime) * time.Millisecond) {
 		if err = r.syncTableIncrRecord(); err != nil {
 			return err
 		}
@@ -112,7 +114,8 @@ func (r *Migrate) FullIncr() error {
 	fmt.Println("############增量##############")
 
 	// 增量数据同步
-	for range time.Tick(300 * time.Millisecond) {
+	IncrTime := r.Cfg.OracleConfig.IncrTime
+	for range time.Tick(time.Duration(IncrTime) * time.Millisecond) {
 		if err = r.syncTableIncrRecord(); err != nil {
 			return err
 		}
