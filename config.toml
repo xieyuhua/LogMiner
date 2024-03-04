@@ -21,7 +21,7 @@ incr-time = 30
 
 # include-table 和 exclude-table 不能同时配置，两者只能配置一个,如果两个都没配置则 Schema 内表全迁移
 # include-table 和 exclude-table 支持正则表达式以及通配符（tab_*/tab*）
-include-table = ["T_SALE_H_XLX","T_DIST_D_XLX","T_STORE_I_XLX"] 
+include-table = ["T_SALE_H","T_DIST_D_XLX","T_STORE_I_XLX"] 
 exclude-table = []
 
 [log]
@@ -30,7 +30,7 @@ log-level = "info"
 # 日志文件路径
 log-file = "./gominerlog.log"
 # 每个日志文件保存的最大尺寸 单位：M
-max-size = 128
+max-size = 1
 # 文件最多保存多少天
 max-days = 7
 # 日志文件最多保存多少个备份

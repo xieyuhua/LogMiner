@@ -1,6 +1,10 @@
 # LogMiner
 无需安装oracle客户端环境，同步是基于LogMiner增量同步
 
+> SELECT value FROM v$parameter WHERE name = 'open_cursors';
+> ALTER SESSION SET OPEN_CURSORS = 3000;
+> ALTER SYSTEM SET OPEN_CURSORS = 3000 SCOPE=BOTH;
+
 ```
 运行
 # go build
