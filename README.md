@@ -4,6 +4,7 @@
 > SELECT value FROM v$parameter WHERE name = 'open_cursors';
 
 > ALTER SESSION SET OPEN_CURSORS = 3000;
+
 > ALTER SYSTEM SET OPEN_CURSORS = 3000 SCOPE=BOTH;
 
 ```
