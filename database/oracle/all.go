@@ -37,11 +37,12 @@ func (o *Oracle) GetOracleIncrRecord(sourceSchema, sourceTable string, lastCheck
    AND UPPER(TABLE_NAME) IN (`, sourceTable, `)
    AND OPERATION IN ('INSERT', 'DELETE', 'UPDATE', 'DDL')
    AND SCN > `, lastCheckpoint, ` ORDER BY SCN`)
+
+	startTime := time.Now()
 	rows, err := o.OracleDB.Query(querySQL)
 	if err != nil {
 		return lcs, MaxSCN, err
 	}
-	startTime := time.Now()
 	for rows.Next() {
 		var lc logminers
 		if err = rows.Scan(&lc.SCN, &lc.SourceSchema, &lc.SourceTable, &lc.SQLRedo, &lc.SQLUndo, &lc.Operation); err != nil {
@@ -67,7 +68,6 @@ func (o *Oracle) GetOracleIncrRecord(sourceSchema, sourceTable string, lastCheck
 		zap.String("end time", endTime.String()),
 		zap.String("cost time", endTime.Sub(startTime).String()))
 	return lcs, MaxSCN, nil
-
 }
 
 func (o *Oracle) GetOracleRedoLogSCN(scn string) (uint64, error) {

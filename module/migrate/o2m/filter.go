@@ -1,4 +1,3 @@
-
 package o2m
 
 import (
@@ -7,13 +6,11 @@ import (
 	"gominerlog/config"
 	"gominerlog/database/oracle"
 	"gominerlog/filter"
-	"time"
-
-	"go.uber.org/zap"
 )
 
+// 过滤规则加载 oracle 所有数据表
 func filterCFGTable(cfg *config.Config, oracle *oracle.Oracle) ([]string, error) {
-	startTime := time.Now()
+	// startTime := time.Now()
 	var (
 		exporterTableSlice []string
 		excludeTables      []string
@@ -74,14 +71,14 @@ func filterCFGTable(cfg *config.Config, oracle *oracle.Oracle) ([]string, error)
 		return exporterTableSlice, fmt.Errorf("exporter tables aren't exist, please check config params include-table/exclude-table")
 	}
 
-	endTime := time.Now()
-	zap.L().Info("get oracle to mysql all tables",
-		zap.String("schema", cfg.OracleConfig.SchemaName),
-		zap.Strings("exporter tables list", exporterTableSlice),
-		zap.Int("include table counts", len(exporterTableSlice)),
-		zap.Int("exclude table counts", len(excludeTables)),
-		zap.Int("all table counts", len(allTables)),
-		zap.String("cost", endTime.Sub(startTime).String()))
+	// endTime := time.Now()
+	// zap.L().Info("get oracle to mysql all tables",
+	// 	zap.String("schema", cfg.OracleConfig.SchemaName),
+	// 	zap.Strings("exporter tables list", exporterTableSlice),
+	// 	zap.Int("include table counts", len(exporterTableSlice)),
+	// 	zap.Int("exclude table counts", len(excludeTables)),
+	// 	zap.Int("all table counts", len(allTables)),
+	// 	zap.String("cost", endTime.Sub(startTime).String()))
 
 	return exporterTableSlice, nil
 }

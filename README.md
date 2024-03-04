@@ -1,5 +1,5 @@
 # LogMiner
-无需安装oracle客户端 基于LogMiner增量同步
+无需安装oracle客户端环境，同步是基于LogMiner增量同步
 
 ```
 运行

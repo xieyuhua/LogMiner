@@ -591,8 +591,8 @@ github.com/valyala/fastjson v1.6.3 h1:tAKFnnwmeMGPbwJ7IwxcTPCNr3uIzoIj3/Fh90ra4x
 github.com/valyala/fastjson v1.6.3/go.mod h1:CLCAqky6SMuOcxStkYQvblddUtoRxhYMGLrsQns1aXY=
 github.com/wdrabbit/gorm-oracle v0.0.0-20220919085856-8e63b4c604e7 h1:NVRxC3KU9FIDELo5yNdWCreUZ0MypDGKTNTcmBll2ew=
 github.com/wdrabbit/gorm-oracle v0.0.0-20220919085856-8e63b4c604e7/go.mod h1:kjYhMgeX1opqX8ISGe+FFpOCRIUjimcrQA1Ny0fZHJo=
-github.com/wentaojin/transferdb v1.0.12 h1:3kh7FBHo3H99I5E8WbJLhpValq51Q03+gg6SA/15ieA=
-github.com/wentaojin/transferdb v1.0.12/go.mod h1:WahS5YhU76hg7XIvMgmf85B/TjGDohph4LWzwNlD1ig=
+github.com/wentaojin/gominerlog v1.0.12 h1:3kh7FBHo3H99I5E8WbJLhpValq51Q03+gg6SA/15ieA=
+github.com/wentaojin/gominerlog v1.0.12/go.mod h1:WahS5YhU76hg7XIvMgmf85B/TjGDohph4LWzwNlD1ig=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2 h1:eY9dn8+vbi4tKz5Qo6v2eYzo7kUS51QINcR5jNpbZS8=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=

@@ -44,6 +44,7 @@ func NewIncr(ctx context.Context, cfg *config.Config) (*Migrate, error) {
 	}, nil
 }
 
+//全量同步
 func (r *Migrate) Full() error {
 
 	// 判断上游 Oracle 数据库版本
@@ -53,7 +54,7 @@ func (r *Migrate) Full() error {
 		return err
 	}
 	if common.VersionOrdinal(oraDBVersion) < common.VersionOrdinal(common.RequireOracleDBVersion) {
-		return fmt.Errorf("oracle db version [%v] is less than 11g, can't be using transferdb tools", oraDBVersion)
+		return fmt.Errorf("oracle db version [%v] is less than 11g, can't be using gominerlog tools", oraDBVersion)
 	}
 	fmt.Println("###########全量###############")
 
@@ -72,6 +73,7 @@ func (r *Migrate) Full() error {
 	return nil
 }
 
+//增量同步
 func (r *Migrate) Incr() error {
 	var err error
 	fmt.Println("############增量##############")
@@ -85,6 +87,7 @@ func (r *Migrate) Incr() error {
 	return nil
 }
 
+//全量同步 + //增量同步
 func (r *Migrate) FullIncr() error {
 
 	// 判断上游 Oracle 数据库版本
@@ -94,7 +97,7 @@ func (r *Migrate) FullIncr() error {
 		return err
 	}
 	if common.VersionOrdinal(oraDBVersion) < common.VersionOrdinal(common.RequireOracleDBVersion) {
-		return fmt.Errorf("oracle db version [%v] is less than 11g, can't be using transferdb tools", oraDBVersion)
+		return fmt.Errorf("oracle db version [%v] is less than 11g, can't be using gominerlog tools", oraDBVersion)
 	}
 	fmt.Println("###########全量###############")
 
@@ -123,6 +126,7 @@ func (r *Migrate) FullIncr() error {
 	return nil
 }
 
+//获取增量同步数据
 func (r *Migrate) syncTableIncrRecord() error {
 
 	// 获取增量所需得日志文件
@@ -131,8 +135,8 @@ func (r *Migrate) syncTableIncrRecord() error {
 		return err
 	}
 	// fmt.Println(logFiles)
-	zap.L().Info("increment table log file get",
-		zap.String("logfile", fmt.Sprintf("%v", logFiles)))
+	// zap.L().Info("increment table log file get",
+	// 	zap.String("logfile", fmt.Sprintf("%v", logFiles)))
 	// 遍历所有日志文件
 	for _, log := range logFiles {
 		// 获取日志文件起始 SCN
@@ -151,11 +155,11 @@ func (r *Migrate) syncTableIncrRecord() error {
 			SourceTableSCN = logFileStartSCN
 		}
 
-		zap.L().Info("increment table log file logminer",
-			zap.String("logfile", log["LOG_FILE"]),
-			zap.Uint64("logfile start scn", logFileStartSCN),
-			zap.Uint64("logminer start scn", logFileStartSCN),
-			zap.Uint64("logfile end scn", logFileEndSCN))
+		// zap.L().Info("increment table log file logminer",
+		// 	zap.String("logfile", log["LOG_FILE"]),
+		// 	zap.Uint64("logfile start scn", logFileStartSCN),
+		// 	zap.Uint64("logminer start scn", logFileStartSCN),
+		// 	zap.Uint64("logfile end scn", logFileEndSCN))
 
 		// logminer 运行
 		if err = r.OracleMiner.AddOracleLogminerlogFile(log["LOG_FILE"]); err != nil {
@@ -175,10 +179,12 @@ func (r *Migrate) syncTableIncrRecord() error {
 			return err
 		}
 		// // 捕获数据
+		startTime := time.Now()
 		rowsResult, MaxSCN, _ := r.OracleMiner.GetOracleIncrRecord(common.StringUPPER(r.Cfg.OracleConfig.SchemaName),
 			common.StringArrayToCapitalChar(exporters),
 			strconv.FormatUint(SourceTableSCN, 10),
 			r.Cfg.AllConfig.LogminerQueryTimeout)
+		endTime := time.Now()
 		//更新到最大
 		SourceTableSCN = MaxSCN
 		if len(rowsResult) > 0 {
@@ -191,22 +197,24 @@ func (r *Migrate) syncTableIncrRecord() error {
 				// fmt.Println(rs.Operation)
 				splitDDL := strings.Split(rs.SQLRedo, ` `)
 				fmt.Println(splitDDL)
+				zap.L().Info("increment table log extractor sql",
+					zap.String("get sql", fmt.Sprintf("%v", splitDDL)))
 				// SQLUndo := strings.Split(rs.SQLUndo, ` `)
 				// fmt.Println(SQLUndo)
 			}
 		}
-
 		if err != nil {
 			return err
 		}
 		zap.L().Info("increment table log extractor", zap.String("logfile", log["LOG_FILE"]),
 			zap.Uint64("logfile start scn", logFileStartSCN),
 			zap.Uint64("source table last scn", logFileEndSCN),
-			zap.Int("row counts", len(rowsResult)))
+			zap.Int("row counts", len(rowsResult)),
+			zap.String("cost time", endTime.Sub(startTime).String()))
 
 		// logminer 关闭
 		if err = r.OracleMiner.EndOracleLogminerStoredProcedure(); err != nil {
-			return err
+			// return err
 		}
 
 		// redoLogList, err := r.OracleMiner.GetOracleALLRedoLogFile()
@@ -219,6 +227,7 @@ func (r *Migrate) syncTableIncrRecord() error {
 	return nil
 }
 
+//获取增量所需得日志文件
 func (r *Migrate) getTableIncrRecordLogfile() ([]map[string]string, error) {
 	var logFiles []map[string]string
 	firstSCN, _, _, err := r.OracleMiner.GetOracleCurrentRedoMaxSCN()
