@@ -231,6 +231,9 @@ func (r *Migrate) syncTableIncrRecord() error {
 func (r *Migrate) getTableIncrRecordLogfile() ([]map[string]string, error) {
 	var logFiles []map[string]string
 	firstSCN, _, _, err := r.OracleMiner.GetOracleCurrentRedoMaxSCN()
+	if err != nil {
+		return logFiles, err
+	}
 	// fmt.Println(firstSCN)
 	// 获取增量表起始最小 SCN 号
 	strGlobalSCN := strconv.FormatUint(firstSCN, 10)
