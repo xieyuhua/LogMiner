@@ -1,14 +1,16 @@
 # LogMiner
 无需安装oracle客户端环境，同步是基于LogMiner增量同步
 
-> SELECT value FROM v$parameter WHERE name = 'open_cursors';
-
-> ALTER SESSION SET OPEN_CURSORS = 3000;
-
-> ALTER SYSTEM SET OPEN_CURSORS = 3000 SCOPE=BOTH;
-
+## 配置规则
 ```
-运行
+# include-table 和 exclude-table 不能同时配置，两者只能配置一个,如果两个都没配置则 Schema 内表全迁移
+# include-table 和 exclude-table 支持正则表达式以及通配符（tab_*/tab*）
+include-table = ["T_SALE_H","T_DIST_D_XLX","T_STORE_I_XLX"] 
+exclude-table = []
+```
+
+## 安装运行
+```
 # go build
 # .\gominerlog.exe -mode incr
 # .\gominerlog.exe -mode full
@@ -23,7 +25,7 @@ LogMiner\module\migrate\o2m\incr.go:192
 [update "H2"."T_STORE_I_XLX" set "PID" = 1709264776 where "PID" = 1709264778]
 ```
 
-
+## 原理
 ```
  增量定时 time.Tick(time.Duration(100) * time.Millisecond)
 
@@ -64,4 +66,11 @@ select sql_redo,timestamp,username,session_info from v$logmnr_contents;
 BEGIN
  DBMS_LOGMNR.END_LOGMNR;
 END ;
+```
+
+## 注意事项
+```
+SELECT value FROM v$parameter WHERE name = 'open_cursors';
+ALTER SESSION SET OPEN_CURSORS = 3000;
+ALTER SYSTEM SET OPEN_CURSORS = 3000 SCOPE=BOTH;
 ```
