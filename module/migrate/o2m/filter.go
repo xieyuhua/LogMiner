@@ -38,7 +38,7 @@ func filterCFGTable(cfg *config.Config, oracle *oracle.Oracle) ([]string, error)
 		// 过滤规则加载
 		f, err := filter.Parse(cfg.OracleConfig.IncludeTable)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		for _, t := range allTables {
@@ -50,7 +50,7 @@ func filterCFGTable(cfg *config.Config, oracle *oracle.Oracle) ([]string, error)
 		// 过滤规则加载
 		f, err := filter.Parse(cfg.OracleConfig.ExcludeTable)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		for _, t := range allTables {
