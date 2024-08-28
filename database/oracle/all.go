@@ -21,6 +21,7 @@ type logminers struct {
 // 捕获增量数据
 func (o *Oracle) GetOracleIncrRecord(sourceSchema, sourceTable string, lastCheckpoint string, queryTimeout int) ([]logminers, uint64, error) {
 	var lcs []logminers
+	var subLcs []logminers
 	var MaxSCN uint64
 	logFileEndSCN, err := common.StrconvUintBitSize(lastCheckpoint, 64)
 	MaxSCN = logFileEndSCN
@@ -30,29 +31,50 @@ func (o *Oracle) GetOracleIncrRecord(sourceSchema, sourceTable string, lastCheck
        cast((TABLE_NAME) as varchar2(1024)) AS SOURCE_TABLE,
        SQL_REDO,
        SQL_UNDO,
+       XIDSQN,
        OPERATION
   FROM V$LOGMNR_CONTENTS
  WHERE 1 = 1
    AND UPPER(SEG_OWNER) = '`, common.StringUPPER(sourceSchema), `'
    AND UPPER(TABLE_NAME) IN (`, sourceTable, `)
    AND OPERATION IN ('INSERT', 'DELETE', 'UPDATE', 'DDL')
-   AND SCN > `, lastCheckpoint, ` ORDER BY SCN`)
+   AND SCN > `, lastCheckpoint, ` ORDER BY XIDSQN,SCN`)
 
 	startTime := time.Now()
 	rows, err := o.OracleDB.Query(querySQL)
 	if err != nil {
 		return lcs, MaxSCN, err
 	}
+	// scn，xidsqn 排序
+	is_update := true
 	for rows.Next() {
 		var lc logminers
 		if err = rows.Scan(&lc.SCN, &lc.SourceSchema, &lc.SourceTable, &lc.SQLRedo, &lc.SQLUndo, &lc.Operation); err != nil {
 			return lcs, MaxSCN, err
 		}
-		if lc.SCN > MaxSCN {
-			MaxSCN = lc.SCN
+		// 同一个事务，完成才提交
+		if common.StringUPPER(lc.Operation)=="START" {
+			is_update = false
+			subLcs = append(subLcs, lc)
+			continue
 		}
-		// 目标库名以及表名
-		lcs = append(lcs, lc)
+		if common.StringUPPER(lc.Operation)=="COMMIT" {
+			is_update = true
+			subLcs = append(subLcs, lc)
+			//合并数据
+			lcs = append(lcs, subLcs...)
+			// 清空切片  
+			subLcs = []logminers{}
+			continue
+		}
+		//合并提交数据
+		if lc.SCN > MaxSCN && is_update{
+			MaxSCN = lc.SCN
+			// 目标库名以及表名
+			lcs = append(lcs, lc)
+		}else{
+			subLcs = append(subLcs, lc)
+		}
 	}
 	defer rows.Close()
 	endTime := time.Now()
